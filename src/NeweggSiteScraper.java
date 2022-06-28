@@ -11,6 +11,7 @@ public class NeweggSiteScraper implements Runnable {
 	public WebDriver driver;
 	private String searchTerm;
 	public List<ItemListing> Items = new ArrayList<ItemListing>();
+	public boolean done = false;
 	
 	public NeweggSiteScraper(String searchTerm)
 	{
@@ -37,6 +38,8 @@ public class NeweggSiteScraper implements Runnable {
 			this.scrape();
 			
 		}
+		this.driver.close();
+		this.done = true;
 	}
 	
 	private void search()
