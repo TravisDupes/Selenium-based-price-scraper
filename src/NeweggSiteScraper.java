@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -9,7 +10,7 @@ import org.openqa.selenium.support.ui.Select;
 public class NeweggSiteScraper implements Runnable {
 	public WebDriver driver;
 	private String searchTerm;
-	public List<ItemListing> Items;
+	public List<ItemListing> Items = new ArrayList<ItemListing>();
 	
 	public NeweggSiteScraper(String searchTerm)
 	{
@@ -26,7 +27,6 @@ public class NeweggSiteScraper implements Runnable {
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -79,14 +79,7 @@ public class NeweggSiteScraper implements Runnable {
 		List<WebElement> SearchResults = this.driver.findElement(By.className("list-wrap")).findElements(By.className("item-container"));
 		for(WebElement listing: SearchResults)
 		{
-			ItemListing CurrentListing = new ItemListing();
-			CurrentListing.productTitle = listing.findElement(By.className("item-title")).getAttribute("innerHTML");
-			CurrentListing.productLink = listing.findElement(By.className("item-title")).getAttribute("href");
-			CurrentListing.priceDollars = Integer.parseInt(listing.findElement(By.className("price")).findElement(By.tagName("strong")).getAttribute("innerHTML"));
-			CurrentListing.priceCents = Integer.parseInt(listing.findElement(By.className("price")).findElement(By.tagName("sup")).getAttribute("innerHTML").substring(1));
-			this.Items.add(CurrentListing);
-			
-			System.out.println(CurrentListing.productTitle + " $" + CurrentListing.priceDollars + "." + CurrentListing.priceCents);
+			this.Items.add(new NeweggItemListing(listing));
 			
 		}
 	}

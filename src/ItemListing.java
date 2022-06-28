@@ -1,3 +1,4 @@
+import org.openqa.selenium.WebElement;
 
 public class ItemListing {
 	public String productTitle;
@@ -15,5 +16,4 @@ public class ItemListing {
 	{
 		
 	}
-
 }
