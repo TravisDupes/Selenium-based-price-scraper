@@ -1,3 +1,4 @@
+import java.util.Collections;
 
 public class DealFinder {
 
@@ -9,7 +10,8 @@ public class DealFinder {
 		boolean allowRefurbished = true;
 		boolean allowOpenBox = true;
 		boolean enforceStringMatch = false;
-			
+		boolean allowBundles = false;
+		
 		String searchTerm = args[args.length - 1].toLowerCase();
 		for(int i=0; i<(args.length-1); i++)
 		{
@@ -46,9 +48,9 @@ public class DealFinder {
 			}
 		}
 		
-		
-		
-		for(ItemListing item: Newegg.Items)
+
+
+		for(ItemListing item: Newegg.Items.subList(0, 5))
 		{
 			if(item.productTitle.toLowerCase().contains(searchTerm)|| enforceStringMatch == false)
 			{
@@ -56,10 +58,14 @@ public class DealFinder {
 				{
 					if(allowOpenBox == true || item.isRefurbished == false)
 					{
+						if(allowBundles == true || item.isBundle == false)
+						{
 
-						System.out.println(item.seller + ":");
-						System.out.println(item.productTitle);
-						System.out.println("$" + item.priceDollars + "." +item.priceCents);
+							System.out.println(item.seller + ":");
+							System.out.println(item.productTitle);
+							System.out.println("$" + item.priceDollars + "." +item.priceCents);
+						}
+						
 					}
 				}
 			}

@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -38,6 +40,7 @@ public class NeweggSiteScraper implements Runnable {
 			this.scrape();
 			
 		}
+		Collections.sort(Items);
 		this.driver.close();
 		this.done = true;
 	}
@@ -59,8 +62,11 @@ public class NeweggSiteScraper implements Runnable {
 	private void soldByNewegg()
 	{
 		WebElement SoldByNewegg = this.driver.findElement(By.xpath("//li[.//div[.=\"Sold by Newegg\"]]"));
-		WebElement toggle = SoldByNewegg.findElement(By.tagName("label"));
-		toggle.click();
+		if (SoldByNewegg.findElement(By.tagName("input")).getAttribute("checked") == null)
+		{
+			WebElement toggle = SoldByNewegg.findElement(By.tagName("label"));
+			toggle.click();
+		}
 	}
 	
 	private void inStock()

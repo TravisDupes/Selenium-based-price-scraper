@@ -26,6 +26,14 @@ public class NeweggItemListing extends ItemListing {
 		{
 			this.isOpenBox = false;
 		}
+		if (this.productTitle.contains(" and "))
+		{
+			this.isBundle = true;
+		}
+		else
+		{
+			this.isBundle = false;
+		}
 		
 	}
 
