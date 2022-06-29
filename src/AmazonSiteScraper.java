@@ -1,15 +1,17 @@
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.Select;
 
 public class AmazonSiteScraper {
 	public WebDriver driver;
 	private String searchTerm;
-	public List<ItemListing> Items;
+	public List<ItemListing> Items  = new ArrayList<ItemListing>();
+	public boolean done = false;
 	
 	public AmazonSiteScraper(String searchTerm)
 	{
@@ -24,6 +26,9 @@ public class AmazonSiteScraper {
 	{
 		this.search();
 		this.addFilters();
+		this.scrape();
+		this.driver.close();
+		this.done = true;
 	}
 	
 	private void search()
@@ -33,18 +38,46 @@ public class AmazonSiteScraper {
 		SearchBar.click();
 		SearchBar.sendKeys(this.searchTerm);
 		SearchBar.submit();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void selectCategory()
 	{
-		Select Dropdown =new Select(  this.driver.findElement(By.id("searchDropdownBox")));
-		Dropdown.selectByVisibleText("Computers");
+		this.driver.findElement(By.id("nav-search-dropdown-card")).click();
+		this.driver.findElement(By.id("searchDropdownBox")).sendKeys("c");
+		this.driver.findElement(By.id("searchDropdownBox")).sendKeys("c");
+		this.driver.findElement(By.id("searchDropdownBox")).sendKeys("c");
+		this.driver.findElement(By.id("searchDropdownBox")).sendKeys("c");
+		this.driver.findElement(By.id("searchDropdownBox")).sendKeys("c");
+		this.driver.findElement(By.id("searchDropdownBox")).submit();
+
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void addFilters()
 	{
 		WebElement FilterPane = this.driver.findElement(By.id("s-refinements"));
-		
+		WebElement SellerPane = FilterPane.findElement(By.xpath("//ul[@aria-labelledby='p_6-title']"));
+		SellerPane.findElement(By.xpath("//span[.='Amazon.com']")).click();
+	}
+	
+	private void scrape()
+	{
+		List<WebElement> ResultsList = this.driver.findElements(By.xpath("//div[@data-component-type='s-search-result']"));
+		for(WebElement listing :ResultsList)
+		{
+			this.Items.add(new AmazonItemListing(listing));
+		}
 	}
 
 }

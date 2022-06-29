@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class DealFinder {
 
@@ -9,7 +11,7 @@ public class DealFinder {
 		
 		boolean allowRefurbished = true;
 		boolean allowOpenBox = true;
-		boolean enforceStringMatch = false;
+		boolean enforceStringMatch = true;
 		boolean allowBundles = false;
 		
 		String searchTerm = args[args.length - 1].toLowerCase();
@@ -33,45 +35,57 @@ public class DealFinder {
 			}
 		}
 		
+
 		
+		AmazonSiteScraper Amazon = new AmazonSiteScraper(searchTerm);
+		Amazon.run();
 		NeweggSiteScraper Newegg = new NeweggSiteScraper(searchTerm);
 		Newegg.run();
 		
+//		
+//		while(Newegg.done == false)
+//		{
+//			try {
+//				Thread.sleep(5000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		
+//
+//
 		
-		while(Newegg.done == false)
+		List<ItemListing> AllItems = new ArrayList<ItemListing>(); 
+		AllItems.addAll(Amazon.Items);
+		AllItems.addAll(Newegg.Items);
+		Collections.sort(AllItems);
+		int itemsFound = 0;
+		for(int index = 0; itemsFound < 5 && index < 20; index++)
 		{
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-
-
-		for(ItemListing item: Newegg.Items.subList(0, 5))
-		{
-			if(item.productTitle.toLowerCase().contains(searchTerm)|| enforceStringMatch == false)
+			if(AllItems.get(index).productTitle.toLowerCase().contains(searchTerm)|| enforceStringMatch == false)
 			{
-				if(allowRefurbished == true || item.isRefurbished == false)
+				if(allowRefurbished == true || AllItems.get(index).isRefurbished == false)
 				{
-					if(allowOpenBox == true || item.isRefurbished == false)
+					if(allowOpenBox == true || AllItems.get(index).isRefurbished == false)
 					{
-						if(allowBundles == true || item.isBundle == false)
+						if(allowBundles == true || AllItems.get(index).isBundle == false)
 						{
 
-							System.out.println(item.seller + ":");
-							System.out.println(item.productTitle);
-							System.out.println("$" + item.priceDollars + "." +item.priceCents);
+							System.out.println(AllItems.get(index).seller + ":");
+							System.out.println(AllItems.get(index).productTitle);
+							System.out.println("$" + AllItems.get(index).priceDollars + "." + AllItems.get(index).priceCents);
+							itemsFound++;
+							
 						}
 						
 					}
 				}
 			}
-
-			
 		}
+		
+			
+		
 	}
 
 }

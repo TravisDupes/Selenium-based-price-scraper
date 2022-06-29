@@ -40,7 +40,6 @@ public class NeweggSiteScraper implements Runnable {
 			this.scrape();
 			
 		}
-		Collections.sort(Items);
 		this.driver.close();
 		this.done = true;
 	}
