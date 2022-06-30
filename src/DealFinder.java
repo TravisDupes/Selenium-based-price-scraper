@@ -35,7 +35,9 @@ public class DealFinder {
 			}
 		}
 		
-
+		BestBuyScraper BestBuy = new BestBuyScraper(searchTerm);
+		BestBuy.run();
+		
 		
 		AmazonSiteScraper Amazon = new AmazonSiteScraper(searchTerm);
 		Amazon.run();
@@ -57,11 +59,12 @@ public class DealFinder {
 //
 		
 		List<ItemListing> AllItems = new ArrayList<ItemListing>(); 
+		AllItems.addAll(BestBuy.Items);
 		AllItems.addAll(Amazon.Items);
 		AllItems.addAll(Newegg.Items);
 		Collections.sort(AllItems);
 		int itemsFound = 0;
-		for(int index = 0; itemsFound < 5 && index < 20; index++)
+		for(int index = 0; index< AllItems.size() ; index++)
 		{
 			if(AllItems.get(index).productTitle.toLowerCase().contains(searchTerm)|| enforceStringMatch == false)
 			{

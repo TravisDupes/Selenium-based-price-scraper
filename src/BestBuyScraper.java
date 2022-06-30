@@ -1,20 +1,31 @@
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 public class BestBuyScraper {
 	public WebDriver driver;
 	private String searchTerm;
-	public List<ItemListing> Items;
+	public List<ItemListing> Items  = new ArrayList<ItemListing>();
+	public boolean done = false;
 	
 	public BestBuyScraper(String searchTerm)
 	{
 		System.setProperty("webdriver.gecko.driver", "/usr/bin/geckodriver/");
 		System.setProperty("webdriver.firefox.bin", "/home/travis/firefox/firefox");
-		this.driver = new FirefoxDriver();
+		
+		FirefoxOptions ffopt = new FirefoxOptions()
+			    .addPreference("dom.webnotifications.enabled", false)
+			    .addPreference("geo.enabled", false)
+			    .addPreference("geo.provider.use_corelocation", false)
+			    .addPreference("geo.prompt.testing", false)
+			    .addPreference("geo.prompt.testing.allow", false);
+		
+		this.driver = new FirefoxDriver(ffopt);
 		driver.get("https://www.bestbuy.com/" );
 		this.searchTerm = searchTerm;
 	}
@@ -23,6 +34,9 @@ public class BestBuyScraper {
 	{
 		this.search();
 		this.addFilters();
+		this.scrape();
+		this.driver.close();
+		this.done = true;
 	}
 	
 	private void search()
@@ -31,29 +45,33 @@ public class BestBuyScraper {
 		SearchBar.click();
 		SearchBar.sendKeys(this.searchTerm);
 		SearchBar.submit();
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void addFilters()
 	{
 		WebElement FilterPane = this.driver.findElement(By.id("main-filters"));
-		FilterPane.findElement(By.id("soldout_facet-Exclude-Out-of-Stock-Items-0")).click();
+		FilterPane.findElement(By.linkText("Exclude Out of Stock Items")).click();
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void scrape()
 	{
-		List<WebElement> ResultsList = this.driver.findElement(By.id("main-results")).findElements(By.className("sku-item"));
+		List<WebElement> ResultsList = this.driver.findElement(By.className("sku-item-list")).findElements(By.className("sku-item"));
 		for(WebElement listing: ResultsList)
 		{
-			ItemListing CurrentListing = new ItemListing();
-			CurrentListing.productTitle = listing.findElement(By.className("sku-title")).findElement(By.tagName("a")).getAttribute("innerHTML");
-			CurrentListing.productLink = listing.findElement(By.className("sku-title")).findElement(By.tagName("a")).getAttribute("href");
+			this.Items.add(new BestBuyItemListing(listing));
 			
-			
-			CurrentListing.priceDollars = Integer.parseInt(listing.findElement(By.className("price")).findElement(By.tagName("strong")).getAttribute("innerHTML"));
-			CurrentListing.priceCents = Integer.parseInt(listing.findElement(By.className("price")).findElement(By.tagName("sup")).getAttribute("innerHTML").substring(1));
-			this.Items.add(CurrentListing);
-			
-			System.out.println(CurrentListing.productTitle + " $" + CurrentListing.priceDollars + "." + CurrentListing.priceCents);
 		}
 		
 	}
